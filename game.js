@@ -28,7 +28,15 @@ const PIECES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
+// Intervalo de caída (ms): inicial, reducción por nivel y mínimo
+const DIFFICULTIES = {
+  easy:      { start: 1200, step: 60, min: 250 },
+  medium:    { start: 1000, step: 90, min: 100 },
+  nightmare: { start: 450,  step: 40, min: 50 },
+};
+
 const canvas = document.getElementById('board');
+const difficultyEl = document.getElementById('difficulty');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
 const nextCtx = nextCanvas.getContext('2d');
@@ -40,6 +48,7 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 
+let difficulty = 'medium';
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
 function createBoard() {
@@ -107,9 +116,14 @@ function clearLines() {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
     level = Math.floor(lines / 10) + 1;
-    dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    dropInterval = calcDropInterval();
     updateHUD();
   }
+}
+
+function calcDropInterval() {
+  const d = DIFFICULTIES[difficulty];
+  return Math.max(d.min, d.start - (level - 1) * d.step);
 }
 
 function ghostY() {
@@ -263,7 +277,7 @@ function init() {
   level = 1;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = calcDropInterval();
   dropAccum = 0;
   lastTime = performance.now();
   next = randomPiece();
@@ -300,5 +314,16 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+difficultyEl.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-difficulty]');
+  if (!btn) return;
+  btn.blur(); // evita que Space/flechas vuelvan a activar el botón
+  if (btn.dataset.difficulty === difficulty) return;
+  difficulty = btn.dataset.difficulty;
+  difficultyEl.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b === btn));
+  init();
+});
 
 init();
