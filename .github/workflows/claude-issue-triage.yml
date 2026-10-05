@@ -46,6 +46,8 @@ jobs:
                Si un label no existe, créalo antes con `gh label create`. Si al editar cambia la clasificación, quita los labels obsoletos con `--remove-label` (solo de los grupos anteriores).
             4. Publica UN solo comentario de diagnóstico en español. Empieza con el marcador `<!-- claude-triage -->`. Si ya existe un comentario con ese marcador (búscalo con `gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments`), actualízalo con `gh api -X PATCH repos/${{ github.repository }}/issues/comments/<id> -f body=...` en vez de crear otro.
 
+            El comentario debe estar en Markdown válido para GitHub (GFM): encabezados `##`, listas con `-`, checklists `- [ ]`, código en backticks o bloques con lenguaje (```js), y referencias a archivos como `game.js:120`. No uses HTML salvo el marcador inicial. Usa saltos de línea reales en el cuerpo, no `\n` literales.
+
             Formato del comentario (será la entrada para una futura implementación automática, así que sé concreto):
             ## Diagnóstico
             - **Resumen:** qué pide o reporta el issue.
