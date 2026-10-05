@@ -86,6 +86,35 @@ body {
   border-radius: 4px;
 }
 
+/* ---- Dificultad ---- */
+.difficulty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.difficulty button {
+  background: #22223a;
+  color: #aaa;
+  border: 1px solid #3a3a5a;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.difficulty button:hover {
+  border-color: #7aa2f7;
+}
+
+.difficulty button.active {
+  background: #7aa2f7;
+  border-color: #7aa2f7;
+  color: #0f0f17;
+  font-weight: 700;
+}
+
 /* ---- Controles ---- */
 .controls ul {
   list-style: none;
