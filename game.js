@@ -47,8 +47,11 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const themeBtn = document.getElementById('theme-btn');
 
 let difficulty = 'medium';
+let theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+let gridColor;
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
 function createBoard() {
@@ -170,6 +173,13 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
+function applyTheme() {
+  document.documentElement.dataset.theme = theme;
+  themeBtn.textContent = theme === 'dark' ? 'Claro' : 'Oscuro';
+  gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid').trim();
+  try { localStorage.setItem('theme', theme); } catch (e) { /* almacenamiento no disponible */ }
+}
+
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
   const color = COLORS[colorIndex];
@@ -183,7 +193,7 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = gridColor;
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -315,6 +325,13 @@ document.addEventListener('keydown', e => {
 
 restartBtn.addEventListener('click', init);
 
+themeBtn.addEventListener('click', () => {
+  themeBtn.blur(); // evita que Space/Enter vuelvan a activar el botón
+  theme = theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+  draw(); // en pausa o game over el loop no repinta
+});
+
 difficultyEl.addEventListener('click', e => {
   const btn = e.target.closest('button[data-difficulty]');
   if (!btn) return;
@@ -326,4 +343,5 @@ difficultyEl.addEventListener('click', e => {
   init();
 });
 
+applyTheme();
 init();

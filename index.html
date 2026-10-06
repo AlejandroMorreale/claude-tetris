@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tetris</title>
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark'; }
+    catch (e) { document.documentElement.dataset.theme = 'dark'; }
+  </script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -21,6 +25,10 @@
             <button type="button" data-difficulty="medium" class="active">Medio</button>
             <button type="button" data-difficulty="nightmare">Pesadilla</button>
           </div>
+        </div>
+        <div class="panel-section">
+          <span class="label">TEMA</span>
+          <button type="button" id="theme-btn">Claro</button>
         </div>
         <div class="panel-section">
           <span class="label">SCORE</span>
