@@ -17,7 +17,7 @@ User-facing text and README are in Spanish; keep new user-facing text Spanish. C
 - Flow: `init` -> `spawn` -> `loop(ts)`. Landing goes through `lockPiece` = `merge` + `clearLines` + `spawn`. A spawn that collides immediately calls `endGame`. Hard drop, soft drop (when blocked) and gravity all end in `lockPiece`.
 - `clearLines` is the only place that updates `level` and `dropInterval` (`max(100, 1000 - (level-1)*90)`); `init` sets `dropInterval = 1000` separately.
 - `tryRotate` tries kicks `[0, -1, 1, -2, 2]` columns only (no vertical kicks, no SRS tables).
-- Rendering: `draw()` runs every frame from `loop`; `drawNext()` runs only from `spawn`. `drawBlock(context, x, y, colorIndex, size, alpha)` is shared by both canvases (the ghost piece uses `alpha = 0.2`).
+- Rendering: `draw()` runs every frame from `loop`; `drawNext()` runs only from `spawn`. `drawBlock(context, x, y, colorIndex, size, alpha)` is a dispatcher to `SKINS[currentSkin].drawBlock` (skins retro/neon/pastel/pixel, each with its own `colors` and `grid`; selector `#skin`, persisted in `localStorage` key `tetris.skin`; canvas backgrounds via `:root[data-skin]` in CSS) and is shared by both canvases (the ghost piece uses `alpha = 0.2`). The dispatcher wraps skins in save/restore, so skins can't leak canvas state.
 - Pause and game over share one overlay (`#overlay`) and one button (`#restart-btn`, wired to `init`), so "Reiniciar" also works while paused. `togglePause` cancels/restarts the rAF loop and resets `lastTime` to avoid a large `dt`.
 - Input is a single `keydown` listener; `ArrowUp` and `KeyX` both rotate. Only `Space` calls `preventDefault`.
 

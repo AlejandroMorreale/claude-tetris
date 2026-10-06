@@ -237,3 +237,11 @@ kbd {
 #restart-btn:hover {
   background: var(--accent-hover);
 }
+
+/* ---- Skins (fondo de los canvas) ---- */
+:root[data-skin="neon"] #board,
+:root[data-skin="neon"] #next-canvas { background: #000; }
+:root[data-skin="pastel"] #board,
+:root[data-skin="pastel"] #next-canvas { background: #fdf6fb; }
+:root[data-skin="pixel"] #board,
+:root[data-skin="pixel"] #next-canvas { background: #12121c; }

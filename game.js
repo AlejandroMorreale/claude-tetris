@@ -180,20 +180,112 @@ function applyTheme() {
   try { localStorage.setItem('theme', theme); } catch (e) { /* almacenamiento no disponible */ }
 }
 
+// ---- Skins visuales ----
+const SKIN_KEY = 'tetris.skin';
+
+function pathRoundRect(context, x, y, w, h, r) {
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
+}
+
+const SKINS = {
+  retro: {
+    colors: COLORS,
+    grid: null, // null = usa el color de la cuadrícula del tema claro/oscuro
+    drawBlock(context, x, y, color, size) {
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      context.fillStyle = 'rgba(255,255,255,0.12)';
+      context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+    },
+  },
+  neon: {
+    colors: [null, '#00f0ff', '#ffee00', '#d500f9', '#39ff14', '#ff1744', '#4d6bff', '#ff9100'],
+    grid: '#16162a',
+    drawBlock(context, x, y, color, size) {
+      const px = x * size + 3, py = y * size + 3, w = size - 6;
+      context.shadowColor = color;
+      context.shadowBlur = 12;
+      context.strokeStyle = color;
+      context.lineWidth = 2;
+      context.strokeRect(px, py, w, w);
+      context.fillStyle = color;
+      context.globalAlpha *= 0.35;
+      context.fillRect(px, py, w, w);
+      context.shadowBlur = 0;
+    },
+  },
+  pastel: {
+    colors: [null, '#a8e6ef', '#fff1b8', '#d7b8f0', '#b9e8c4', '#f6b5b5', '#b8c2f0', '#ffd6a5'],
+    grid: '#e6dfea',
+    drawBlock(context, x, y, color, size) {
+      pathRoundRect(context, x * size + 2, y * size + 2, size - 4, size - 4, size * 0.3);
+      context.fillStyle = color;
+      context.fill();
+      context.strokeStyle = 'rgba(255,255,255,0.7)';
+      context.lineWidth = 1.5;
+      context.stroke();
+    },
+  },
+  pixel: {
+    colors: [null, '#29b6f6', '#fdd835', '#ab47bc', '#66bb6a', '#ef5350', '#5c6bc0', '#ffa726'],
+    grid: '#2a2a3a',
+    drawBlock(context, x, y, color, size) {
+      const px = x * size + 1, py = y * size + 1, s = size - 2;
+      const u = Math.max(2, Math.round(s / 6)); // tamaño del "pixel"
+      context.fillStyle = color;
+      context.fillRect(px, py, s, s);
+      // bordes de luz y sombra
+      context.fillStyle = 'rgba(255,255,255,0.35)';
+      context.fillRect(px, py, s, u);
+      context.fillRect(px, py, u, s);
+      context.fillStyle = 'rgba(0,0,0,0.35)';
+      context.fillRect(px, py + s - u, s, u);
+      context.fillRect(px + s - u, py, u, s);
+      // textura de damero
+      context.fillStyle = 'rgba(0,0,0,0.18)';
+      for (let i = 1; i < 5; i++)
+        for (let j = 1; j < 5; j++)
+          if ((i + j) % 2 === 0) context.fillRect(px + i * u, py + j * u, u, u);
+    },
+  },
+};
+
+function loadSkin() {
+  try {
+    const saved = localStorage.getItem(SKIN_KEY);
+    if (saved && Object.prototype.hasOwnProperty.call(SKINS, saved)) return saved;
+  } catch (e) { /* almacenamiento no disponible */ }
+  return 'retro';
+}
+
+let currentSkin = loadSkin();
+const skinEl = document.getElementById('skin');
+
+function applySkin() {
+  document.documentElement.dataset.skin = currentSkin;
+  skinEl.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b.dataset.skin === currentSkin));
+  try { localStorage.setItem(SKIN_KEY, currentSkin); } catch (e) { /* almacenamiento no disponible */ }
+}
+
+// Despachador: delega en la skin activa (la usan #board y #next-canvas)
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const skin = SKINS[currentSkin];
+  context.save();
   context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
-  context.globalAlpha = 1;
+  skin.drawBlock(context, x, y, skin.colors[colorIndex], size);
+  context.restore();
 }
 
 function drawGrid() {
-  ctx.strokeStyle = gridColor;
+  ctx.strokeStyle = SKINS[currentSkin].grid || gridColor;
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -343,5 +435,17 @@ difficultyEl.addEventListener('click', e => {
   init();
 });
 
+skinEl.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-skin]');
+  if (!btn) return;
+  btn.blur(); // evita que Space/flechas vuelvan a activar el botón
+  if (!Object.prototype.hasOwnProperty.call(SKINS, btn.dataset.skin)) return;
+  currentSkin = btn.dataset.skin;
+  applySkin();
+  draw(); // en pausa o game over el loop no repinta
+  drawNext();
+});
+
 applyTheme();
+applySkin();
 init();
