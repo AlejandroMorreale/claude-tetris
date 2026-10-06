@@ -237,3 +237,81 @@ kbd {
 #restart-btn:hover {
   background: var(--accent-hover);
 }
+
+/* ---- Records ---- */
+#gameover-panel.hidden,
+#records-panel.hidden {
+  display: none;
+}
+
+#gameover-panel,
+#records-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+}
+
+#gameover-panel label {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.name-row {
+  display: flex;
+  gap: 4px;
+}
+
+#name-input {
+  width: 110px;
+  padding: 4px 6px;
+  background: var(--canvas-bg);
+  color: var(--text);
+  border: 1px solid var(--btn-border);
+  border-radius: 4px;
+  user-select: text;
+}
+
+#save-name-btn,
+#reset-records-btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: 1px solid var(--btn-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#save-name-btn:hover,
+#reset-records-btn:hover {
+  border-color: var(--accent);
+}
+
+#records-table {
+  border-collapse: collapse;
+  color: var(--text);
+}
+
+#records-table th,
+#records-table td {
+  padding: 2px 8px;
+  text-align: left;
+}
+
+#records-table th {
+  color: var(--label);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+#records-table tr.new-record td {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+#records-stats {
+  color: var(--muted);
+}

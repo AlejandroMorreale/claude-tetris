@@ -26,3 +26,4 @@ User-facing text and README are in Spanish; keep new user-facing text Spanish. C
 - Changing `COLS`, `ROWS` or `BLOCK` requires updating `width`/`height` of `<canvas id="board">` in `index.html` (`COLS*BLOCK` x `ROWS*BLOCK`, currently 300x600). `next-canvas` is 120x120 and `drawNext` assumes a 4x4 cell area at 30px.
 - `README.md` is a detailed description but may drift from the code; its project tree says `03-tetris/` while the folder is `03-claude-tetris`. Trust `game.js`.
 - Piece selection is uniform random (`randomPiece`), not a 7-bag.
+- Records: `localStorage` key `tetris.records` (`{top[5], bestCombo, maxLines}`), block "Tabla de records" in `game.js`. Page loads on a start screen (`showStartScreen`, overlay with "Jugar"); `endGame` calls `showGameOverRecords`. `keydown` ignores events from INPUT.
